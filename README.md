@@ -94,8 +94,3 @@ MIT
 - 🌐 Want API control over Wine apps? Let’s build that together.
 
 Ping me — let's make this project production-ready 🚀
-
---- 
-
-Если хочешь — могу сразу сделать репо с полной структурой и всеми файлами.  
-Хочешь?
