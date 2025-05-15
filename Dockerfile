@@ -1,10 +1,64 @@
-FROM ubuntu:kinetic
+FROM ubuntu:25.04
+
+# Установка базовых пакетов
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        software-properties-common \
+        wget \
+        gpg \
+        sudo \
+        locales \
+        net-tools \
+        procps \
+        xz-utils \
+        xvfb \
+        fluxbox \
+        tightvncserver \
+        dbus-x11 \
+        git && \
+    rm -rf /var/lib/apt/lists/*
+
+# Добавление i386 архитектуры
 RUN dpkg --add-architecture i386
+
+# Ключи и репозитории WineHQ
+RUN mkdir -pm755 /etc/apt/keyrings && \
+    wget -O - https://dl.winehq.org/wine-builds/winehq.key  | gpg --dearmor -o /etc/apt/keyrings/winehq-archive.key && \
+    wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/plucky/winehq-plucky.sources 
+
+# Обновление пакетов
 RUN apt-get update
-RUN apt-get install net-tools tightvncserver -y
-RUN mkdir -pm755 /etc/apt/keyrings
-RUN wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
-RUN wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/kinetic/winehq-kinetic.sources
-RUN apt-get update
-RUN apt-get install wine winetricks winbind xorg-dev libx11-dev -y
-CMD rm -Rf ~/.wine && WINEARCH=win32 WINEPREFIX=/home/$(whoami)/.wine winecfg && wineboot -u && winetricks winhttp msxml3 msxml4 dotnet45 corefonts lucida tahoma vb6run mdac28 mfc42 jet40 native_oleaut32 && winetricks --force dotnet472;
+
+# Установка Wine Staging
+RUN apt-get install -y --install-recommends winehq-staging
+
+# Установка winetricks
+RUN apt-get install -y winetricks winbind
+
+# Локали
+RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && locale-gen
+
+# Установка noVNC
+ENV NOVNC_HOME /opt/noVNC
+RUN cd /tmp && \
+    git clone https://github.com/novnc/noVNC.git  $NOVNC_HOME && \
+    $NOVNC_HOME/utils/websockify/run --help >/dev/null 2>&1 || true
+
+# Установка websockify
+RUN apt-get install -y python3-pip && \
+    pip3 install websockify
+
+# Копируем скрипты
+COPY entrypoint.sh /entrypoint.sh
+COPY novnc_setup.sh /novnc_setup.sh
+RUN chmod +x /entrypoint.sh /novnc_setup.sh
+
+# ENV vars
+ENV WINEARCH=win32
+ENV WINEPREFIX=/home/user/.wine
+ENV DISPLAY=:1
+ENV HOME=/home/user
+
+EXPOSE 5901 8080
+
+ENTRYPOINT ["/entrypoint.sh"]
