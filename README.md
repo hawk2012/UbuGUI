@@ -84,13 +84,3 @@ Example:
 ## 📜 License
 
 MIT
-
----
-
-## 💬 Want More?
-
-- 📁 Want this on GitHub with CI/CD, Makefile, ARM support? I can help!
-- 📦 Need an image that auto-runs a specific `.exe` file? I’ll extend it.
-- 🌐 Want API control over Wine apps? Let’s build that together.
-
-Ping me — let's make this project production-ready 🚀
