@@ -15,7 +15,9 @@ RUN apt-get update && \
         fluxbox \
         tightvncserver \
         dbus-x11 \
-        git && \
+        git \
+        python3 \
+        python3-pip && \
     rm -rf /var/lib/apt/lists/*
 
 # Добавление i386 архитектуры
@@ -23,8 +25,8 @@ RUN dpkg --add-architecture i386
 
 # Ключи и репозитории WineHQ
 RUN mkdir -pm755 /etc/apt/keyrings && \
-    wget -O - https://dl.winehq.org/wine-builds/winehq.key  | gpg --dearmor -o /etc/apt/keyrings/winehq-archive.key && \
-    wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/plucky/winehq-plucky.sources 
+    wget -qO- https://dl.winehq.org/wine-builds/winehq.key | gpg --dearmor -o /etc/apt/keyrings/winehq-archive.key && \
+    wget -qNP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/plucky/winehq-plucky.sources 
 
 # Обновление пакетов
 RUN apt-get update
@@ -45,8 +47,7 @@ RUN cd /tmp && \
     $NOVNC_HOME/utils/websockify/run --help >/dev/null 2>&1 || true
 
 # Установка websockify
-RUN apt-get install -y python3-pip && \
-    pip3 install websockify
+RUN pip3 install websockify
 
 # Копируем скрипты
 COPY entrypoint.sh /entrypoint.sh

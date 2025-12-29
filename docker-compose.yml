@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  wine-novnc:
+    build: .
+    container_name: wine-desktop
+    ports:
+      - "5901:5901"  # VNC
+      - "8080:8080"  # noVNC web interface
+    environment:
+      - VNC_USER=user
+      - VNC_PASS=1
+    volumes:
+      - ./shared:/home/user/shared  # Для обмена файлами
+    restart: unless-stopped
+    shm_size: '2gb'  # Для лучшей производительности графики
