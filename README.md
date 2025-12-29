@@ -14,6 +14,8 @@
 - ✅ Dynamic **user/password setup via environment variables**
 - ✅ Works out of the box — just build and run
 - ✅ Can be used as a base for automated testing or legacy app hosting
+- ✅ Includes Fluxbox lightweight desktop environment
+- ✅ Support for 3D acceleration and graphics extensions
 
 ---
 
@@ -32,7 +34,7 @@
 docker build -t wine-novnc .
 ```
 
-### Run the container
+### Run the container with Docker
 
 ```bash
 docker run -d \
@@ -41,7 +43,19 @@ docker run -d \
   -p 8080:8080 \
   -e VNC_USER=myuser \
   -e VNC_PASS=mypass \
+  -v $(pwd)/shared:/home/user/shared \
+  --shm-size=2g \
   wine-novnc
+```
+
+### Or use Docker Compose (recommended)
+
+```bash
+# First create a shared directory
+mkdir -p shared
+
+# Run with docker-compose
+docker-compose up -d
 ```
 
 ---
@@ -69,15 +83,16 @@ You will see a full X11 desktop environment inside the browser 🖥️
 | 🧰 Add your own .exe | Mount a volume and run `wine /path/to/your.exe` inside the container |
 | 📦 Headless mode | Remove GUI tools from Dockerfile if needed |
 | ⚙️ Extend functionality | Add more packages in Dockerfile or modify `entrypoint.sh` |
+| 💾 Shared folder | Mount volume to `/home/user/shared` for file exchange |
 
 ---
 
-## 📸 Screenshot (Optional)
+## 📝 Usage Tips
 
-*(Add a screenshot of the VNC desktop in the browser here if you want)*
-
-Example:
-![noVNC Desktop](screenshot.png "Wine Desktop via noVNC")
+1. **First Run**: The container will initialize Wine environment which may take 1-2 minutes
+2. **File Sharing**: Place Windows executables in the `shared` folder to easily access them
+3. **Performance**: The container includes 3D acceleration support for better graphics performance
+4. **Persistence**: Wine settings are preserved between container restarts
 
 ---
 
